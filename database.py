@@ -18,6 +18,7 @@ def create_task(title, description, status="pending"):
     cursor.execute("INSERT INTO tasks (title, description, status) VALUES (?, ?, ?)", 
                    (title, description, status))
     conn.commit()
+    return cursor.lastrowid
 
 def get_task(task_id):
     """Retrieve a task from the database by ID."""
@@ -26,6 +27,12 @@ def get_task(task_id):
     if task_data:
         return task_data  # Return the tuple directly
     return None
+
+def get_all_tasks():
+    """Retrieve all tasks from the database."""
+    cursor.execute("SELECT * FROM tasks")
+    return cursor.fetchall()
+
 
 def update_task(task_id, title, description, status):
     """Update an existing task in the database."""

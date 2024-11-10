@@ -13,12 +13,19 @@ def main():
             title = input("Enter task title: ")
             description = input("Enter task description: ")
             task = tasks.Task(title, description)
-            # Call database.create_task with title and description instead of the task object
-            database.create_task(task.title, task.description, task.status)
+            # Get the new task's ID from create_task function
+            task.id = database.create_task(task.title, task.description, task.status)
             tasks_list.append(task)
             print(f"Task '{task.title}' created with ID {task.id}.")
 
         elif user_input == "list":
+            tasks_list = []
+            db_tasks = database.get_all_tasks()  # Fetch all tasks from the database
+            for task in db_tasks:
+                task_obj = tasks.Task(task[1], task[2])
+                task_obj.id = task[0]
+                task_obj.status = task[3]
+                tasks_list.append(task_obj)
             task_ui.print_tasks(tasks_list)
 
         elif user_input == "update":
@@ -32,6 +39,14 @@ def main():
                 task_obj.update_status(new_status)
                 database.update_task(task_obj.id, task_obj.title, task_obj.description, task_obj.status)
                 print(f"Task {task_obj.id} updated to status '{task_obj.status}'.")
+                # Reload tasks_list after update
+                db_tasks = database.get_all_tasks()
+                tasks_list = []
+                for task in db_tasks:
+                    task_obj = tasks.Task(task[1], task[2])
+                    task_obj.id = task[0]
+                    task_obj.status = task[3]
+                    tasks_list.append(task_obj)
             else:
                 print(f"Task with ID {task_id} not found.")
 
